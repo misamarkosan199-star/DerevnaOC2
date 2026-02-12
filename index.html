@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0e0e11">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Derevna24/2</title>
+    <style>
+        /* Стили для мобильных устройств */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            background: #1C2833;
+            color: #ECF0F1;
+            height: 100vh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+        
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            overflow-y: auto;
+        }
+        
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* Цвета */
+        .bg-primary { background: #2E86C1; }
+        .bg-secondary { background: #27AE60; }
+        .bg-accent { background: #E74C3C; }
+        .bg-dark { background: #1C2833; }
+        .bg-card { background: #2C3E50; }
+        .bg-darker { background: #17202A; }
+        .bg-admin { background: #9B59B6; }
+        .bg-success { background: #2ECC71; }
+        .bg-warning { background: #F39C12; }
+        .bg-danger { background: #E74C3C; }
+        .bg-info { background: #3498DB; }
+        
+        /* Текст */
+        .text-white { color: #ECF0F1; }
+        .text-gray { color: #BDC3C7; }
+        .text-green { color: #2ECC71; }
+        .text-red { color: #E74C3C; }
+        .text-yellow { color: #F39C12; }
+        .text-purple { color: #9B59B6; }
+        
+        /* Шрифты */
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #BDC3C7;
+        }
+        
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .body-text {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .small-text {
+            font-size: 12px;
+            color: #BDC3C7;
+        }
+        
+        /* Карточки */
+        .card {
+            background: #2C3E50;
+            border-radius: 15px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #2E86C1;
+            margin: 20px 0;
+        }
+        
+        .news-card {
+            background: #2C3E50;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #2E86C1;
+        }
+        
+        .news-card.admin {
+            border-left: 4px solid #9B59B6;
+            background: #3a2d42;
+        }
+        
+        /* Кнопки */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+            opacity: 0.8;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+            margin: 5px;
+        }
+        
+        /* Поля ввода */
+        .input-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            background: #34495E;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        textarea.input-field {
+            min-height: 150px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #2E86C1;
+        }
+        
+        /* Видео контейнер */
+        #video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #splash-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Загрузка */
+        #loading {
+            position: absolute;
+            bottom: 50px;
+            color: white;
+            font-size: 18px;
+            z-index: 1001;
+        }
+        
+        /* Верхняя панель */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #17202A;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        /* Список */
+        .list {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .list-item {
+            background: #2C3E50;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Прокрутка */
+        .scroll-container {
+            width: 100%;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            padding: 80px 20px 20px;
+        }
+        
+        /* Новости */
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .news-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #ECF0F1;
+        }
+        
+        .news-date {
+            font-size: 12px;
+            color: #BDC3C7;
+        }
+        
+        .news-content {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .news-author {
+            font-size: 12px;
+            color: #2E86C1;
+            margin-top: 10px;
+        }
+        
+        .news-author.admin {
+            color: #9B59B6;
+        }
+        
+        .news-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+        
+        .tag-update { background: #2ECC71; color: white; }
+        .tag-event { background: #F39C12; color: white; }
+        .tag-important { background: #E74C3C; color: white; }
+        .tag-job { background: #3498DB; color: white; }
+        .tag-system { background: #9B59B6; color: white; }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        /* Бейджи */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .badge-admin {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        .badge-user {
+            background: #2E86C1;
+            color: white;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 28px;
+            }
+            
+            .header {
+                font-size: 22px;
+            }
+        }
+        
+        /* Ховеры для десктопа */
+        @media (hover: hover) {
+            .btn:hover {
+                transform: translateY(-2px);
+            }
+        }
+        
+        /* Тач для мобильных */
+        .btn {
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body>
+    <!-- Видео заставка -->
+    <div id="video-container">
+        <video id="splash-video" autoplay muted playsinline>
+            <source src="Video/splash.mp4" type="video/mp4">
+        </video>
+        <audio id="splash-audio" loop>
+            <source src="Video/sound.mp3" type="audio/mpeg">
+        </audio>
+        <div id="loading">Загрузка системы...</div>
+    </div>
+
+    <!-- Экран активации -->
+    <div id="activation-screen" class="screen bg-dark">
+        <div class="card slide-up">
+            <h1 class="title text-white">DEREVNA</h1>
+            <p class="subtitle">24/2</p>
+            
+            <div class="body-text text-center" style="margin-bottom: 30px;">
+                <p>СИСТЕМА АКТИВАЦИИ</p>
+            </div>
+            
+            <button class="btn bg-primary" onclick="activateSystem()">
+                ⚡ АКТИВИРОВАТЬ
+            </button>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <p class="small-text">© 2024 Derevna Corporation</p>
+                <p class="small-text">Версия 2.0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран авторизации -->
+    <div id="auth-screen" class="screen bg-dark">
+        <div class="card slide-up">
+            <h2 class="header text-white">ВХОД В СИСТЕМУ</h2>
+            
+            <div class="input-group">
+                <label class="input-label text-white">Логин:</label>
+                <input type="text" id="login-input" class="input-field" placeholder="Введите логин">
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label text-white">Пароль:</label>
+                <input type="password" id="password-input" class="input-field" placeholder="Введите пароль">
+            </div>
+            
+            <button class="btn bg-primary" onclick="login()">
+                ВОЙТИ
+            </button>
+            
+            <button class="btn bg-secondary" onclick="showScreen('register-screen')">
+                РЕГИСТРАЦИЯ
+            </button>
+            
+            <button class="btn bg-gray" onclick="showScreen('activation-screen')" style="margin-top: 20px;">
+                ← НАЗАД
+            </button>
+        </div>
+    </div>
+
+    <!-- Экран регистрации -->
+    <div id="register-screen" class="screen bg-dark">
+        <div class="card slide-up">
+            <h2 class="header text-white">РЕГИСТРАЦИЯ</h2>
+            
+            <div class="input-group">
+                <label class="input-label text-white">Логин:</label>
+                <input type="text" id="reg-login-input" class="input-field" placeholder="Придумайте логин">
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label text-white">Пароль:</label>
+                <input type="password" id="reg-password-input" class="input-field" placeholder="Придумайте пароль">
+            </div>
+            
+            <button class="btn bg-success" onclick="register()">
+                СОЗДАТЬ АККАУНТ
+            </button>
+            
+            <button class="btn bg-danger" onclick="showScreen('auth-screen')">
+                ← НАЗАД
+            </button>
+        </div>
+    </div>
+
+    <!-- Выбор персонажа -->
+    <div id="character-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <span class="title" style="font-size: 20px;">ВЫБОР ПЕРСОНАЖА</span>
+            <button class="btn bg-danger btn-small" onclick="logout()">
+                ← ВЫЙТИ
+            </button>
+        </div>
+        
+        <div class="scroll-container">
+            <div id="characters-list" class="list">
+                <!-- Список персонажей будет здесь -->
+            </div>
+            
+            <button class="btn bg-success" onclick="showScreen('create-character-screen')" style="margin-top: 20px;">
+                + СОЗДАТЬ НОВОГО ПЕРСОНАЖА
+            </button>
+            
+            <button class="btn bg-warning" onclick="skipCharacter()" style="margin-top: 10px;">
+                ПРОПУСТИТЬ
+            </button>
+        </div>
+    </div>
+
+    <!-- Создание персонажа -->
+    <div id="create-character-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <span class="title" style="font-size: 20px;">СОЗДАНИЕ ПЕРСОНАЖА</span>
+            <button class="btn bg-danger btn-small" onclick="showScreen('character-screen')">
+                ← НАЗАД
+            </button>
+        </div>
+        
+        <div class="scroll-container">
+            <div class="card">
+                <div class="input-group">
+                    <label class="input-label text-white">Имя:</label>
+                    <input type="text" id="char-firstname" class="input-field" placeholder="Введите имя">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Фамилия:</label>
+                    <input type="text" id="char-lastname" class="input-field" placeholder="Введите фамилию">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Возраст:</label>
+                    <input type="number" id="char-age" class="input-field" placeholder="Введите возраст" min="1" max="120">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Город:</label>
+                    <input type="text" id="char-city" class="input-field" placeholder="Введите город">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Страна:</label>
+                    <input type="text" id="char-country" class="input-field" placeholder="Введите страну">
+                </div>
+                
+                <button class="btn bg-success" onclick="createCharacter()">
+                    СОЗДАТЬ ПЕРСОНАЖА
+                </button>
+                
+                <button class="btn bg-warning" onclick="skipCharacter()">
+                    ПРОПУСТИТЬ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главное меню -->
+    <div id="main-menu-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <span class="title" style="font-size: 20px;">Derevna24/2</span>
+            <div id="user-info" class="small-text"></div>
+        </div>
+        
+        <div class="scroll-container">
+            <h2 class="header text-white">ГЛАВНОЕ МЕНЮ</h2>
+            
+            <div class="list">
+                <button class="list-item btn bg-primary" onclick="showSection('games')">
+                    🎮 МИНИ-ИГРЫ
+                </button>
+                
+                <button class="list-item btn bg-secondary" onclick="showSection('jobs')">
+                    💼 РАБОТА
+                </button>
+                
+                <button class="list-item btn bg-accent" onclick="showNewsSection()">
+                    📰 НОВОСТИ
+                    <span id="news-badge" class="badge badge-admin" style="display: none;">0</span>
+                </button>
+                
+                <button class="list-item btn bg-info" onclick="showProfile()">
+                    👤 ПРОФИЛЬ
+                </button>
+                
+                <button class="list-item btn bg-admin" onclick="showSection('settings')">
+                    ⚙️ НАСТРОЙКИ
+                </button>
+                
+                <button class="list-item btn bg-danger" onclick="logout()" style="margin-top: 30px;">
+                    ВЫЙТИ ИЗ СИСТЕМЫ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Админ панель -->
+    <div id="admin-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <span class="title" style="font-size: 20px; color: #9B59B6;">АДМИН ПАНЕЛЬ</span>
+            <div>
+                <button class="btn bg-primary btn-small" onclick="showCreateNewsScreen()">
+                    + Новость
+                </button>
+                <button class="btn bg-danger btn-small" onclick="logout()">
+                    ← ВЫЙТИ
+                </button>
+            </div>
+        </div>
+        
+        <div class="scroll-container">
+            <div class="card">
+                <h3 class="text-white" style="margin-bottom: 20px;">
+                    Администратор: <span id="admin-name"></span>
+                    <span class="badge badge-admin">ADMIN</span>
+                </h3>
+                
+                <div class="body-text" style="margin-bottom: 30px;">
+                    <p>Статус сервера: <span id="server-status" style="color: #2ECC71;">🟢 Онлайн</span></p>
+                    <p>Всего пользователей: <span id="total-users">0</span></p>
+                    <p>Всего новостей: <span id="total-news">0</span></p>
+                </div>
+                
+                <button class="btn bg-success" onclick="startServer()">
+                    🚀 ЗАПУСТИТЬ СЕРВЕР
+                </button>
+                
+                <button class="btn bg-danger" onclick="stopServer()">
+                    ⛔ ОСТАНОВИТЬ СЕРВЕР
+                </button>
+                
+                <button class="btn bg-warning" onclick="restartServer()">
+                    🔄 ПЕРЕЗАГРУЗИТЬ СЕРВЕР
+                </button>
+                
+                <button class="btn bg-info" onclick="manageUsers()">
+                    👥 УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ
+                </button>
+                
+                <button class="btn bg-admin" onclick="manageNews()">
+                    📰 УПРАВЛЕНИЕ НОВОСТЯМИ
+                </button>
+                
+                <button class="btn bg-darker" onclick="shutdownSystem()" style="margin-top: 30px;">
+                    💀 ВЫКЛЮЧИТЬ СИСТЕМУ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Создание новости -->
+    <div id="create-news-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <span class="title" style="font-size: 20px;">СОЗДАНИЕ НОВОСТИ</span>
+            <button class="btn bg-danger btn-small" onclick="showScreen('admin-screen')">
+                ← НАЗАД
+            </button>
+        </div>
+        
+        <div class="scroll-container">
+            <div class="card">
+                <div class="input-group">
+                    <label class="input-label text-white">Заголовок новости:</label>
+                    <input type="text" id="news-title" class="input-field" placeholder="Введите заголовок">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Содержание:</label>
+                    <textarea id="news-content" class="input-field" placeholder="Введите текст новости..."></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Тип новости:</label>
+                    <select id="news-type" class="input-field">
+                        <option value="update">🔄 Обновление</option>
+                        <option value="event">🎉 Событие</option>
+                        <option value="important">⚠️ Важное</option>
+                        <option value="job">💼 Работа</option>
+                        <option value="system">⚙️ Системное</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Приоритет:</label>
+                    <select id="news-priority" class="input-field">
+                        <option value="normal">Обычный</option>
+                        <option value="high">Высокий</option>
+                        <option value="urgent">Срочный</option>
+                    </select>
+                </div>
+                
+                <button class="btn bg-success" onclick="createNews()">
+                    📢 ОПУБЛИКОВАТЬ НОВОСТЬ
+                </button>
+                
+                <button class="btn bg-warning" onclick="saveNewsDraft()">
+                    💾 СОХРАНИТЬ ЧЕРНОВИК
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Управление новостями -->
+    <div id="manage-news-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <span class="title" style="font-size: 20px;">УПРАВЛЕНИЕ НОВОСТЯМИ</span>
+            <div>
+                <button class="btn bg-success btn-small" onclick="showCreateNewsScreen()">
+                    + Новая
+                </button>
+                <button class="btn bg-danger btn-small" onclick="showScreen('admin-screen')">
+                    ← Назад
+                </button>
+            </div>
+        </div>
+        
+        <div class="scroll-container">
+            <h3 class="text-white" style="margin-bottom: 20px;">Все новости (<span id="all-news-count">0</span>)</h3>
+            
+            <div id="news-management-list" class="list">
+                <!-- Список новостей для управления -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Раздел новостей -->
+    <div id="news-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <span class="title" style="font-size: 20px;">НОВОСТИ</span>
+            <div>
+                <button class="btn bg-primary btn-small" onclick="refreshNews()">
+                    🔄 Обновить
+                </button>
+                <button class="btn bg-danger btn-small" onclick="showScreen('main-menu-screen')">
+                    ← Назад
+                </button>
+            </div>
+        </div>
+        
+        <div class="scroll-container">
+            <div id="news-filter" style="margin-bottom: 20px;">
+                <button class="btn bg-card btn-small" onclick="filterNews('all')">
+                    Все
+                </button>
+                <button class="btn bg-primary btn-small" onclick="filterNews('update')">
+                    Обновления
+                </button>
+                <button class="btn bg-warning btn-small" onclick="filterNews('event')">
+                    События
+                </button>
+                <button class="btn bg-danger btn-small" onclick="filterNews('important')">
+                    Важные
+                </button>
+                <button class="btn bg-success btn-small" onclick="filterNews('job')">
+                    Работа
+                </button>
+            </div>
+            
+            <div id="news-list" class="list">
+                <!-- Список новостей будет здесь -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Просмотр новости -->
+    <div id="view-news-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <span class="title" style="font-size: 20px;">НОВОСТЬ</span>
+            <button class="btn bg-danger btn-small" onclick="showNewsSection()">
+                ← Назад
+            </button>
+        </div>
+        
+        <div class="scroll-container">
+            <div id="full-news-view" class="card">
+                <!-- Полная новость будет здесь -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Разделы меню -->
+    <div id="section-screen" class="screen bg-dark">
+        <div class="top-bar">
+            <button class="btn bg-danger" onclick="showScreen('main-menu-screen')" style="width: auto; padding: 8px 15px;">
+                ← НАЗАД
+            </button>
+        </div>
+        
+        <div class="scroll-container">
+            <h2 id="section-title" class="header text-white"></h2>
+            <div id="section-content" class="list">
+                <!-- Контент раздела -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Скрипты -->
+    <script>
+        // Данные приложения
+        let appData = {
+            currentUser: null,
+            currentCharacter: null,
+            isAdmin: false,
+            users: {},
+            characters: {},
+            news: [],
+            serverStatus: '🟢 Онлайн'
+        };
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            initVideo();
+        });
+
+        // Загрузка данных из localStorage
+        function loadData() {
+            // Загружаем пользователей
+            const savedUsers = localStorage.getItem('derevna_users');
+            if (savedUsers) {
+                appData.users = JSON.parse(savedUsers);
+            } else {
+                // Создаем администратора по умолчанию
+                appData.users = {
+                    "Paswa": {
+                        password: "181010",
+                        is_admin: true,
+                        created_at: new Date().toISOString()
+                    }
+                };
+                saveUsers();
+            }
+            
+            // Загружаем персонажей
+            const savedChars = localStorage.getItem('derevna_characters');
+            if (savedChars) {
+                appData.characters = JSON.parse(savedChars);
+            } else {
+                appData.characters = {};
+                saveCharacters();
+            }
+            
+            // Загружаем новости
+            const savedNews = localStorage.getItem('derevna_news');
+            if (savedNews) {
+                appData.news = JSON.parse(savedNews);
+            } else {
+                // Создаем тестовые новости
+                appData.news = [
+                    {
+                        id: 1,
+                        title: "Запуск системы Derevna24/2",
+                        content: "Добро пожаловать в новую систему Derevna24/2! Теперь доступны улучшенная графика, новые функции и оптимизированный интерфейс.",
+                        type: "system",
+                        priority: "high",
+                        author: "Paswa",
+                        is_admin: true,
+                        created_at: new Date().toISOString(),
+                        views: 0,
+                        likes: 0
+                    },
+                    {
+                        id: 2,
+                        title: "Добавлены новые рабочие места",
+                        content: "Теперь доступны новые профессии: программист, дизайнер и менеджер. Зарабатывайте больше и развивайтесь!",
+                        type: "job",
+                        priority: "normal",
+                        author: "Paswa",
+                        is_admin: true,
+                        created_at: new Date(Date.now() - 86400000).toISOString(), // Вчера
+                        views: 0,
+                        likes: 0
+                    },
+                    {
+                        id: 3,
+                        title: "Обновление безопасности",
+                        content: "Улучшена система безопасности. Рекомендуем сменить пароль если вы давно этого не делали.",
+                        type: "important",
+                        priority: "high",
+                        author: "Paswa",
+                        is_admin: true,
+                        created_at: new Date(Date.now() - 172800000).toISOString(), // Позавчера
+                        views: 0,
+                        likes: 0
+                    }
+                ];
+                saveNews();
+            }
+        }
+
+        // Сохранение данных
+        function saveUsers() {
+            localStorage.setItem('derevna_users', JSON.stringify(appData.users));
+        }
+
+        function saveCharacters() {
+            localStorage.setItem('derevna_characters', JSON.stringify(appData.characters));
+        }
+
+        function saveNews() {
+            localStorage.setItem('derevna_news', JSON.stringify(appData.news));
+        }
+
+        // Инициализация видео заставки
+        function initVideo() {
+            const video = document.getElementById('splash-video');
+            const audio = document.getElementById('splash-audio');
+            
+            video.play().catch(e => {
+                console.log("Автовоспроизведение видео не удалось:", e);
+                setTimeout(() => video.play(), 100);
+            });
+            
+            setTimeout(() => {
+                audio.volume = 0.7;
+                audio.play().catch(e => {
+                    console.log("Автовоспроизведение звука не удалось:", e);
+                });
+            }, 500);
+            
+            video.addEventListener('ended', function() {
+                setTimeout(() => {
+                    document.getElementById('video-container').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('video-container').style.display = 'none';
+                        showScreen('activation-screen');
+                        audio.pause();
+                    }, 300);
+                }, 1000);
+            });
+            
+            setTimeout(() => {
+                if (video.readyState < 2) {
+                    document.getElementById('video-container').style.display = 'none';
+                    showScreen('activation-screen');
+                }
+            }, 5000);
+        }
+
+        // Показать экран
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            const screen = document.getElementById(screenId);
+            if (screen) {
+                screen.classList.add('active');
+                
+                // Обновление информации
+                if (screenId === 'main-menu-screen') {
+                    updateUserInfo();
+                    updateNewsBadge();
+                } else if (screenId === 'admin-screen') {
+                    updateAdminInfo();
+                } else if (screenId === 'character-screen') {
+                    loadCharacters();
+                } else if (screenId === 'news-screen') {
+                    loadNews();
+                } else if (screenId === 'manage-news-screen') {
+                    loadNewsManagement();
+                }
+            }
+        }
+
+        // Активация системы
+        function activateSystem() {
+            const activationScreen = document.getElementById('activation-screen');
+            activationScreen.innerHTML = `
+                <div class="card" style="background: black; border-color: #00FF00;">
+                    <div id="activation-text" style="font-family: monospace; color: #00FF00; font-size: 18px; min-height: 200px;"></div>
+                </div>
+            `;
+            
+            const textElement = document.getElementById('activation-text');
+            const messages = [
+                "АКТИВАЦИЯ СИСТЕМЫ...",
+                "ПРОВЕРКА КЛЮЧА...",
+                "ПОДКЛЮЧЕНИЕ К СЕТИ...",
+                "АКТИВАЦИЯ УСПЕШНА!",
+                "ДОБРО ПОЖАЛОВАТЬ!"
+            ];
+            
+            let index = 0;
+            
+            function typeMessage() {
+                if (index < messages.length) {
+                    textElement.textContent = messages[index];
+                    index++;
+                    setTimeout(typeMessage, 1000);
+                } else {
+                    setTimeout(() => showScreen('auth-screen'), 1000);
+                }
+            }
+            
+            typeMessage();
+        }
+
+        // Вход в систему
+        function login() {
+            const login = document.getElementById('login-input').value;
+            const password = document.getElementById('password-input').value;
+            
+            if (!login || !password) {
+                alert('Заполните все поля!');
+                return;
+            }
+            
+            // Проверка администратора
+            if (login === "Paswa" && password === "181010") {
+                appData.currentUser = "Paswa";
+                appData.isAdmin = true;
+                appData.currentCharacter = null;
+                showScreen('admin-screen');
+                return;
+            }
+            
+            // Проверка обычного пользователя
+            if (appData.users[login]) {
+                const user = appData.users[login];
+                
+                if (user.password === password) {
+                    appData.currentUser = login;
+                    appData.isAdmin = user.is_admin || false;
+                    
+                    // Проверяем есть ли персонажи
+                    if (appData.characters[login] && Object.keys(appData.characters[login]).length > 0) {
+                        showScreen('character-screen');
+                    } else {
+                        showScreen('create-character-screen');
+                    }
+                    return;
+                }
+            }
+            
+            alert('Неверный логин или пароль!');
+        }
+
+        // Регистрация
+        function register() {
+            const login = document.getElementById('reg-login-input').value;
+            const password = document.getElementById('reg-password-input').value;
+            
+            if (!login || !password) {
+                alert('Заполните все поля!');
+                return;
+            }
+            
+            if (appData.users[login]) {
+                alert('Логин уже существует!');
+                return;
+            }
+            
+            if (login === "Paswa") {
+                alert('Этот логин зарезервирован!');
+                return;
+            }
+            
+            appData.users[login] = {
+                password: password,
+                is_admin: false,
+                created_at: new Date().toISOString()
+            };
+            
+            saveUsers();
+            
+            appData.currentUser = login;
+            appData.isAdmin = false;
+            
+            alert('Аккаунт успешно создан!');
+            showScreen('create-character-screen');
+        }
+
+        // Загрузка персонажей
+        function loadCharacters() {
+            const container = document.getElementById('characters-list');
+            const userChars = appData.characters[appData.currentUser] || {};
+            
+            if (Object.keys(userChars).length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center;">
+                        <p class="body-text">У вас нет персонажей!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            for (const charName in userChars) {
+                const char = userChars[charName];
+                html += `
+                    <div class="list-item">
+                        <div>
+                            <strong>${char.first_name} ${char.last_name}</strong><br>
+                            <span class="small-text">${char.age} лет, ${char.city}</span>
+                        </div>
+                        <button class="btn bg-primary btn-small" onclick="selectCharacter('${charName}')">
+                            Выбрать
+                        </button>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Выбор персонажа
+        function selectCharacter(charName) {
+            appData.currentCharacter = charName;
+            const char = appData.characters[appData.currentUser][charName];
+            alert(`Выбран персонаж: ${char.first_name} ${char.last_name}`);
+            showScreen('main-menu-screen');
+        }
+
+        // Создание персонажа
+        function createCharacter() {
+            const firstName = document.getElementById('char-firstname').value;
+            const lastName = document.getElementById('char-lastname').value;
+            const age = parseInt(document.getElementById('char-age').value);
+            const city = document.getElementById('char-city').value;
+            const country = document.getElementById('char-country').value;
+            
+            if (!firstName || !lastName || !age) {
+                alert('Заполните обязательные поля!');
+                return;
+            }
+            
+            if (age < 1 || age > 120 || isNaN(age)) {
+                alert('Введите корректный возраст!');
+                return;
+            }
+            
+            const charName = `${firstName}_${lastName}`;
+            
+            if (!appData.characters[appData.currentUser]) {
+                appData.characters[appData.currentUser] = {};
+            }
+            
+            appData.characters[appData.currentUser][charName] = {
+                first_name: firstName,
+                last_name: lastName,
+                age: age,
+                city: city || "Не указано",
+                country: country || "Не указано",
+                created_at: new Date().toISOString(),
+                level: 1,
+                money: 1000
+            };
+            
+            saveCharacters();
+            
+            appData.currentCharacter = charName;
+            alert(`Персонаж ${firstName} ${lastName} создан!`);
+            showScreen('main-menu-screen');
+        }
+
+        // Пропустить создание персонажа
+        function skipCharacter() {
+            appData.currentCharacter = null;
+            showScreen('main-menu-screen');
+        }
+
+        // Обновить информацию о пользователе
+        function updateUserInfo() {
+            const userInfo = document.getElementById('user-info');
+            if (appData.currentUser && appData.currentCharacter) {
+                const char = appData.characters[appData.currentUser][appData.currentCharacter];
+                userInfo.textContent = `${char.first_name} ${char.last_name} | Ур. ${char.level}`;
+            } else if (appData.currentUser) {
+                userInfo.textContent = appData.currentUser;
+            } else {
+                userInfo.textContent = '';
+            }
+        }
+
+        // Обновить бейдж новостей
+        function updateNewsBadge() {
+            const badge = document.getElementById('news-badge');
+            if (appData.news.length > 0) {
+                badge.textContent = appData.news.length;
+                badge.style.display = 'inline-block';
+                
+                // Проверяем новые важные новости
+                const newImportantNews = appData.news.filter(news => 
+                    news.priority === 'urgent' && 
+                    !news.viewed_by || 
+                    !news.viewed_by.includes(appData.currentUser)
+                );
+                
+                if (newImportantNews.length > 0) {
+                    badge.style.backgroundColor = '#E74C3C';
+                }
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Показать профиль
+        function showProfile() {
+            if (appData.currentUser && appData.currentCharacter) {
+                const char = appData.characters[appData.currentUser][appData.currentCharacter];
+                const profile = `
+Имя: ${char.first_name}
+Фамилия: ${char.last_name}
+Возраст: ${char.age}
+Город: ${char.city}
+Страна: ${char.country}
+Уровень: ${char.level}
+Деньги: ${char.money} монет
+Статус: ${appData.isAdmin ? 'Администратор' : 'Пользователь'}
+Создан: ${new Date(char.created_at).toLocaleDateString()}
+                `;
+                alert(profile);
+            } else {
+                alert('Персонаж не выбран');
+            }
+        }
+
+        // Показать новости
+        function showNewsSection() {
+            showScreen('news-screen');
+        }
+
+        // Загрузить новости
+        function loadNews(filterType = 'all') {
+            const container = document.getElementById('news-list');
+            
+            // Сортируем новости по дате (новые сначала)
+            const sortedNews = [...appData.news].sort((a, b) => 
+                new Date(b.created_at) - new Date(a.created_at)
+            );
+            
+            // Фильтруем если нужно
+            const filteredNews = filterType === 'all' 
+                ? sortedNews 
+                : sortedNews.filter(news => news.type === filterType);
+            
+            if (filteredNews.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center;">
+                        <p class="body-text">Нет новостей</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filteredNews.forEach(news => {
+                const date = new Date(news.created_at);
+                const tagClass = `tag-${news.type}`;
+                const tagText = getTagText(news.type);
+                
+                html += `
+                    <div class="news-card ${news.is_admin ? 'admin' : ''}" onclick="viewNews(${news.id})">
+                        <div class="news-header">
+                            <div class="news-title">${news.title}</div>
+                            <div class="news-date">${formatDate(date)}</div>
+                        </div>
+                        <div class="news-content">
+                            ${news.content.length > 100 ? news.content.substring(0, 100) + '...' : news.content}
+                        </div>
+                        <div>
+                            <span class="news-tag ${tagClass}">${tagText}</span>
+                            ${news.priority === 'urgent' ? '<span class="news-tag tag-important">СРОЧНО</span>' : ''}
+                            ${news.priority === 'high' ? '<span class="news-tag tag-important">ВАЖНО</span>' : ''}
+                        </div>
+                        <div class="news-author ${news.is_admin ? 'admin' : ''}">
+                            📝 ${news.author} ${news.is_admin ? '👑' : ''}
+                            <span style="float: right;">👁️ ${news.views || 0} ❤️ ${news.likes || 0}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Фильтрация новостей
+        function filterNews(type) {
+            loadNews(type);
+        }
+
+        // Обновить новости
+        function refreshNews() {
+            loadNews('all');
+        }
+
+        // Просмотр полной новости
+        function viewNews(newsId) {
+            const news = appData.news.find(n => n.id === newsId);
+            if (!news) return;
+            
+            // Увеличиваем счетчик просмотров
+            if (!news.views) news.views = 0;
+            news.views++;
+            
+            // Отмечаем как прочитанную для текущего пользователя
+            if (!news.viewed_by) news.viewed_by = [];
+            if (!news.viewed_by.includes(appData.currentUser)) {
+                news.viewed_by.push(appData.currentUser);
+            }
+            
+            saveNews();
+            
+            const container = document.getElementById('full-news-view');
+            const date = new Date(news.created_at);
+            const tagClass = `tag-${news.type}`;
+            const tagText = getTagText(news.type);
+            
+            container.innerHTML = `
+                <div class="news-header" style="margin-bottom: 20px;">
+                    <div class="title" style="font-size: 22px;">${news.title}</div>
+                    <div class="news-date">${formatDate(date)}</div>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <span class="news-tag ${tagClass}">${tagText}</span>
+                    ${news.priority === 'urgent' ? '<span class="news-tag tag-important">СРОЧНО</span>' : ''}
+                    ${news.priority === 'high' ? '<span class="news-tag tag-important">ВАЖНО</span>' : ''}
+                </div>
+                
+                <div class="news-content" style="font-size: 16px; line-height: 1.8; margin-bottom: 30px;">
+                    ${news.content.replace(/\n/g, '<br>')}
+                </div>
+                
+                <div class="news-author ${news.is_admin ? 'admin' : ''}" style="margin-bottom: 20px;">
+                    <strong>Автор:</strong> ${news.author} ${news.is_admin ? '<span class="badge badge-admin">ADMIN</span>' : ''}
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <span style="margin-right: 15px;">👁️ ${news.views} просмотров</span>
+                        <span>❤️ ${news.likes || 0} лайков</span>
+                    </div>
+                    ${appData.currentUser === news.author || appData.isAdmin ? `
+                    <div>
+                        <button class="btn bg-warning btn-small" onclick="editNews(${news.id})">
+                            ✏️ Редактировать
+                        </button>
+                        <button class="btn bg-danger btn-small" onclick="deleteNews(${news.id})">
+                            🗑️ Удалить
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                ${!news.liked_by || !news.liked_by.includes(appData.currentUser) ? `
+                <button class="btn bg-success" onclick="likeNews(${news.id})">
+                    ❤️ Поставить лайк
+                </button>
+                ` : `
+                <button class="btn bg-gray" onclick="unlikeNews(${news.id})">
+                    💔 Убрать лайк
+                </button>
+                `}
+            `;
+            
+            showScreen('view-news-screen');
+        }
+
+        // Лайк новости
+        function likeNews(newsId) {
+            const news = appData.news.find(n => n.id === newsId);
+            if (!news) return;
+            
+            if (!news.likes) news.likes = 0;
+            if (!news.liked_by) news.liked_by = [];
+            
+            if (!news.liked_by.includes(appData.currentUser)) {
+                news.likes++;
+                news.liked_by.push(appData.currentUser);
+                saveNews();
+                viewNews(newsId); // Обновляем вид
+            }
+        }
+
+        // Убрать лайк
+        function unlikeNews(newsId) {
+            const news = appData.news.find(n => n.id === newsId);
+            if (!news || !news.liked_by) return;
+            
+            const index = news.liked_by.indexOf(appData.currentUser);
+            if (index > -1) {
+                news.likes--;
+                news.liked_by.splice(index, 1);
+                saveNews();
+                viewNews(newsId);
+            }
+        }
+
+        // Показать экран создания новости
+        function showCreateNewsScreen() {
+            // Очищаем поля
+            document.getElementById('news-title').value = '';
+            document.getElementById('news-content').value = '';
+            document.getElementById('news-type').value = 'update';
+            document.getElementById('news-priority').value = 'normal';
+            
+            showScreen('create-news-screen');
+        }
+
+        // Создать новость
+        function createNews() {
+            const title = document.getElementById('news-title').value.trim();
+            const content = document.getElementById('news-content').value.trim();
+            const type = document.getElementById('news-type').value;
+            const priority = document.getElementById('news-priority').value;
+            
+            if (!title || !content) {
+                alert('Заполните заголовок и содержание!');
+                return;
+            }
+            
+            // Генерируем ID
+            const newId = appData.news.length > 0 
+                ? Math.max(...appData.news.map(n => n.id)) + 1 
+                : 1;
+            
+            const newNews = {
+                id: newId,
+                title: title,
+                content: content,
+                type: type,
+                priority: priority,
+                author: appData.currentUser,
+                is_admin: appData.isAdmin,
+                created_at: new Date().toISOString(),
+                views: 0,
+                likes: 0,
+                liked_by: [],
+                viewed_by: []
+            };
+            
+            appData.news.unshift(newNews); // Добавляем в начало
+            saveNews();
+            
+            alert('Новость успешно опубликована!');
+            showScreen('admin-screen');
+        }
+
+        // Сохранить черновик
+        function saveNewsDraft() {
+            const draft = {
+                title: document.getElementById('news-title').value,
+                content: document.getElementById('news-content').value,
+                type: document.getElementById('news-type').value,
+                priority: document.getElementById('news-priority').value,
+                saved_at: new Date().toISOString()
+            };
+            
+            localStorage.setItem('derevna_news_draft', JSON.stringify(draft));
+            alert('Черновик сохранен!');
+        }
+
+        // Управление новостями
+        function manageNews() {
+            showScreen('manage-news-screen');
+        }
+
+        // Загрузка управления новостями
+        function loadNewsManagement() {
+            const container = document.getElementById('news-management-list');
+            const countElement = document.getElementById('all-news-count');
+            
+            countElement.textContent = appData.news.length;
+            
+            if (appData.news.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center;">
+                        <p class="body-text">Нет новостей для управления</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            appData.news.forEach(news => {
+                const date = new Date(news.created_at);
+                const tagClass = `tag-${news.type}`;
+                const tagText = getTagText(news.type);
+                
+                html += `
+                    <div class="list-item">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; margin-bottom: 5px;">${news.title}</div>
+                            <div class="small-text">
+                                <span class="${tagClass}" style="padding: 2px 5px; border-radius: 3px; font-size: 10px;">${tagText}</span>
+                                • ${formatDate(date)} • 👁️ ${news.views} • ❤️ ${news.likes}
+                            </div>
+                            <div class="small-text">Автор: ${news.author} ${news.is_admin ? '👑' : ''}</div>
+                        </div>
+                        <div>
+                            <button class="btn bg-warning btn-small" onclick="editNews(${news.id})">
+                                ✏️
+                            </button>
+                            <button class="btn bg-danger btn-small" onclick="deleteNews(${news.id})">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Редактировать новость
+        function editNews(newsId) {
+            const news = appData.news.find(n => n.id === newsId);
+            if (!news) return;
+            
+            // Проверяем права
+            if (news.author !== appData.currentUser && !appData.isAdmin) {
+                alert('У вас нет прав для редактирования этой новости!');
+                return;
+            }
+            
+            // Заполняем форму
+            document.getElementById('news-title').value = news.title;
+            document.getElementById('news-content').value = news.content;
+            document.getElementById('news-type').value = news.type;
+            document.getElementById('news-priority').value = news.priority;
+            
+            // Меняем кнопку
+            const form = document.querySelector('#create-news-screen .card');
+            form.innerHTML = `
+                <h3 class="text-white" style="margin-bottom: 20px;">Редактирование новости</h3>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Заголовок новости:</label>
+                    <input type="text" id="edit-news-title" class="input-field" value="${news.title}">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Содержание:</label>
+                    <textarea id="edit-news-content" class="input-field">${news.content}</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Тип новости:</label>
+                    <select id="edit-news-type" class="input-field">
+                        <option value="update" ${news.type === 'update' ? 'selected' : ''}>🔄 Обновление</option>
+                        <option value="event" ${news.type === 'event' ? 'selected' : ''}>🎉 Событие</option>
+                        <option value="important" ${news.type === 'important' ? 'selected' : ''}>⚠️ Важное</option>
+                        <option value="job" ${news.type === 'job' ? 'selected' : ''}>💼 Работа</option>
+                        <option value="system" ${news.type === 'system' ? 'selected' : ''}>⚙️ Системное</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label text-white">Приоритет:</label>
+                    <select id="edit-news-priority" class="input-field">
+                        <option value="normal" ${news.priority === 'normal' ? 'selected' : ''}>Обычный</option>
+                        <option value="high" ${news.priority === 'high' ? 'selected' : ''}>Высокий</option>
+                        <option value="urgent" ${news.priority === 'urgent' ? 'selected' : ''}>Срочный</option>
+                    </select>
+                </div>
+                
+                <button class="btn bg-success" onclick="updateNews(${news.id})">
+                    💾 СОХРАНИТЬ ИЗМЕНЕНИЯ
+                </button>
+                
+                <button class="btn bg-danger" onclick="showCreateNewsScreen()">
+                    ❌ ОТМЕНИТЬ
+                </button>
+            `;
+            
+            showScreen('create-news-screen');
+        }
+
+        // Обновить новость
+        function updateNews(newsId) {
+            const news = appData.news.find(n => n.id === newsId);
+            if (!news) return;
+            
+            const title = document.getElementById('edit-news-title').value.trim();
+            const content = document.getElementById('edit-news-content').value.trim();
+            const type = document.getElementById('edit-news-type').value;
+            const priority = document.getElementById('edit-news-priority').value;
+            
+            if (!title || !content) {
+                alert('Заполните заголовок и содержание!');
+                return;
+            }
+            
+            // Обновляем новость
+            news.title = title;
+            news.content = content;
+            news.type = type;
+            news.priority = priority;
+            news.updated_at = new Date().toISOString();
+            
+            saveNews();
+            alert('Новость обновлена!');
+            showScreen('manage-news-screen');
+        }
+
+        // Удалить новость
+        function deleteNews(newsId) {
+            if (!confirm('Вы уверены, что хотите удалить эту новость?')) return;
+            
+            const index = appData.news.findIndex(n => n.id === newsId);
+            if (index > -1) {
+                const news = appData.news[index];
+                
+                // Проверяем права
+                if (news.author !== appData.currentUser && !appData.isAdmin) {
+                    alert('У вас нет прав для удаления этой новости!');
+                    return;
+                }
+                
+                appData.news.splice(index, 1);
+                saveNews();
+                alert('Новость удалена!');
+                
+                // Обновляем список
+                if (document.getElementById('manage-news-screen').classList.contains('active')) {
+                    loadNewsManagement();
+                } else if (document.getElementById('news-screen').classList.contains('active')) {
+                    loadNews();
+                }
+            }
+        }
+
+        // Управление пользователями
+        function manageUsers() {
+            alert('Раздел управления пользователями в разработке');
+        }
+
+        // Обновить информацию админа
+        function updateAdminInfo() {
+            document.getElementById('admin-name').textContent = appData.currentUser;
+            document.getElementById('total-users').textContent = Object.keys(appData.users).length;
+            document.getElementById('total-news').textContent = appData.news.length;
+            updateServerStatus();
+        }
+
+        // Админ функции сервера
+        function updateServerStatus() {
+            document.getElementById('server-status').textContent = appData.serverStatus;
+            const statusEl = document.getElementById('server-status');
+            
+            if (appData.serverStatus.includes('🟢')) {
+                statusEl.style.color = '#2ECC71';
+            } else if (appData.serverStatus.includes('🔴')) {
+                statusEl.style.color = '#E74C3C';
+            } else if (appData.serverStatus.includes('🟡')) {
+                statusEl.style.color = '#F39C12';
+            }
+        }
+
+        function startServer() {
+            appData.serverStatus = '🟢 Онлайн';
+            updateServerStatus();
+            alert('Сервер успешно запущен!');
+        }
+
+        function stopServer() {
+            appData.serverStatus = '🔴 Офлайн';
+            updateServerStatus();
+            alert('Сервер успешно остановлен!');
+        }
+
+        function restartServer() {
+            appData.serverStatus = '🟡 Перезагрузка...';
+            updateServerStatus();
+            
+            setTimeout(() => {
+                appData.serverStatus = '🟢 Онлайн';
+                updateServerStatus();
+                alert('Сервер успешно перезагружен!');
+            }, 2000);
+        }
+
+        // Выйти из системы
+        function logout() {
+            appData.currentUser = null;
+            appData.currentCharacter = null;
+            appData.isAdmin = false;
+            showScreen('auth-screen');
+        }
+
+        // Показать раздел
+        function showSection(section) {
+            const title = document.getElementById('section-title');
+            const content = document.getElementById('section-content');
+            
+            let sectionTitle = '';
+            let items = [];
+            
+            switch(section) {
+                case 'games':
+                    sectionTitle = '🎮 МИНИ-ИГРЫ';
+                    items = ['Аркады', 'Головоломки', 'Стратегии', 'Гонки', 'Спорт'];
+                    break;
+                case 'jobs':
+                    sectionTitle = '💼 РАБОТА';
+                    items = ['Программист', 'Дизайнер', 'Менеджер', 'Водитель', 'Повар'];
+                    break;
+                case 'settings':
+                    sectionTitle = '⚙️ НАСТРОЙКИ';
+                    items = ['Звук', 'Графика', 'Управление', 'Язык', 'Безопасность'];
+                    break;
+            }
+            
+            title.textContent = sectionTitle;
+            
+            let html = '';
+            items.forEach(item => {
+                html += `
+                    <button class="list-item btn bg-card" onclick="alert('Раздел \\'${item}\\' в разработке')">
+                        ${item}
+                    </button>
+                `;
+            });
+            
+            content.innerHTML = html;
+            showScreen('section-screen');
+        }
+
+        // Вспомогательные функции
+        function getTagText(type) {
+            switch(type) {
+                case 'update': return '🔄 Обновление';
+                case 'event': return '🎉 Событие';
+                case 'important': return '⚠️ Важное';
+                case 'job': return '💼 Работа';
+                case 'system': return '⚙️ Системное';
+                default: return '📰 Новость';
+            }
+        }
+
+        function formatDate(date) {
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'только что';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч назад`;
+            if (diff < 604800000) return `${Math.floor(diff / 86400000)} дн назад`;
+            
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        // Сохранение перед закрытием
+        window.addEventListener('beforeunload', function() {
+            saveUsers();
+            saveCharacters();
+            saveNews();
+        });
+    </script>
+</body>
+</html>
